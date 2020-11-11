@@ -1,0 +1,26 @@
+name: Check
+
+on: [ push, pull_request ]
+
+jobs:
+  build:
+    name: build
+    runs-on: ubuntu-20.04
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - run: sudo apt-get update
+    - run: sudo apt-get -y install openjdk-8-jdk git curl unzip swig ninja-build
+    - run: sudo update-java-alternatives --list || true
+    - run: sudo update-java-alternatives --set java-1.8.0-openjdk-amd64 
+    - run: echo $JAVA_HOME
+    - run: java -version
+    - run: javac -version
+    - run: update-alternatives --display keytool
+    - run: sudo update-alternatives --set keytool /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/keytool
+    - run: keytool -genkey -keystore ${HOME}/android.jks -keyalg RSA -keysize 4096 -sigalg SHA256withRSA -dname "CN=eduVPN for Android" -validity 10000 -alias eduVPN
+    - run: |
+        JAVA_HOME="/usr/lib/jvm/java-1.8.0-openjdk-amd64"
+        bash ./builder_setup.sh
+        bash ./build_app_git.sh
