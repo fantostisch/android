@@ -21,6 +21,7 @@ package nl.eduvpn.app.viewmodel
 import android.content.Context
 import android.os.Handler
 import android.text.Spanned
+import android.util.Log
 import androidx.core.text.HtmlCompat
 import androidx.lifecycle.MutableLiveData
 import de.blinkt.openvpn.VpnProfile
@@ -60,7 +61,11 @@ class ConnectionStatusViewModel @Inject constructor(
 
     private var updateCertHandler: Handler = Handler()
     private var updateCertCallback: Runnable = Runnable {
-        if(updateCertExpiry()) {
+        Log.d(TAG, "update cert expiry running")
+        val result = updateCertExpiry()
+        Thread.sleep(15 * 1000)
+        Log.d(TAG, "update cert expiry finished")
+        if(result) {
             runUpdateCertExpiryEverySecond()
         }
     }
@@ -104,7 +109,9 @@ class ConnectionStatusViewModel @Inject constructor(
     }
 
     private fun stopUpdateCertExpiry() {
+        Log.d(TAG, "Removing cert expiry")
         updateCertHandler.removeCallbacks(updateCertCallback)
+        Log.d(TAG, "Removed cert expiry")
     }
 
     /**
